@@ -2,10 +2,14 @@ package com.mmc.Tuan.Controller;
 
 import com.mmc.Tuan.Data.Post;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import java.io.ByteArrayOutputStream;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 import com.mmc.Tuan.Repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,20 +43,22 @@ public class PostController {
         }
     }
 
-    @PostMapping("/post/create")
-        public ResponseEntity<Post> setPost (@RequestBody Post post){
-            try {
-                Post post1 = postRepository.save(new Post(post.getPostName()
-                                                        , post.getPostDescription()
-                                                        , post.getPostContent()
-                                                        , post.getPostType()
-                                                        , post.getPostYear()
-                                                        , post.getPostPic()));
-                return new ResponseEntity<>(post1,HttpStatus.OK);
-            } catch (Exception e){
-                return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
-            }
-    }
+
+
+//    @GetMapping("/post/search/{name}")
+//    public  ResponseEntity<List<Post>> searchPost (@PathVariable("name") String postName){
+//        List<Post> posts = postRepository.findByPostNameContaining(postName);
+//        try{
+//            if(posts.isEmpty()){
+//                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+//            }
+//            return new ResponseEntity<>(posts,HttpStatus.OK);
+//        } catch(Exception e){
+//            return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+//        }
+//    }
+
+//    @DeleteMapping("post/delete/id")
 
     @GetMapping("/post/{type}")
     public ResponseEntity<List<Post>> getAllProject (@PathVariable("type") String posttype){
@@ -81,6 +87,20 @@ public class PostController {
         }
     }
 
+    @GetMapping("/post/detail/{id}")
+    public ResponseEntity<Post> getPostById (@PathVariable("id") long postId){
+        Optional<Post> post = postRepository.findByPostId(postId);
+        try {
+            if(post.isPresent()){
+                return new ResponseEntity<>(post.get(),HttpStatus.OK);
+            }
+            return new ResponseEntity<>(new Post(), HttpStatus.NOT_FOUND);
+
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
     @GetMapping("/post/{type}/{year}/{id}")
     public ResponseEntity<Post> getPost (@PathVariable("type") String postType, @PathVariable("year") long postYear, @PathVariable("id") long postId){
         Optional<Post> post = postRepository.findByPostTypeAndPostYearAndPostId(postType,postYear,postId);
@@ -94,23 +114,41 @@ public class PostController {
         }
     }
 
-    @PutMapping("/post/{type}/{year}/{id}/repair")
-    public ResponseEntity<Post> repairPost (@PathVariable("type") String postType, @PathVariable("year") long postYear,
-                                            @PathVariable("id") long postId, @RequestBody Post post ) {
-        Optional<Post> post1 = postRepository.findByPostTypeAndPostYearAndPostId(postType, postYear, postId);
-        try {
-            if (post1.isPresent()){
-                Post _post = post1.get();
-                _post.setPostName(post.getPostName());
-                _post.setPostType(post.getPostType());
-                _post.setPostDescription(post.getPostDescription());
-                _post.setPostContent(post.getPostContent());
-                _post.setPostPic(post.getPostPic());
-                return new ResponseEntity<>(postRepository.save(_post), HttpStatus.OK);
-            }
-            return new ResponseEntity<>(new Post(), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+
+
+    public static byte[] compressBytes(byte[] data) {
+        Deflater deflater = new Deflater();
+        deflater.setInput(data);
+        deflater.finish();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+        byte[] buffer = new byte[1024];
+        while (!deflater.finished()) {
+            int count = deflater.deflate(buffer);
+            outputStream.write(buffer, 0, count);
         }
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+        }
+        System.out.println("Compressed Image Byte Size - " + outputStream.toByteArray().length);
+        return outputStream.toByteArray();
     }
+
+    public static byte[] decompressBytes(byte[] data) {
+        Inflater inflater = new Inflater();
+        inflater.setInput(data);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+        byte[] buffer = new byte[1024];
+        try {
+            while (!inflater.finished()) {
+                int count = inflater.inflate(buffer);
+                outputStream.write(buffer, 0, count);
+            }
+            outputStream.close();
+        } catch (IOException ioe) {
+        } catch (DataFormatException e) {
+        }
+        return outputStream.toByteArray();
+    }
+
 }

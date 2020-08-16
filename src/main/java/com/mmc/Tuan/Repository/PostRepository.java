@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface PostRepository extends JpaRepository<Post, Long>{
     List<Post> findByPostNameContaining (String postName);
     List<Post> findByPostType (String postType);
+    Optional<Post> findByPostId (long postId);
     List<Post> findByPostTypeAndPostYear (String postType, long postYear);
     Optional<Post> findByPostTypeAndPostYearAndPostId (String postType, long postYear, long postId);
 }
