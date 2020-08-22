@@ -16,7 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://mmc-website-e135b.web.app")
+// @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/mmc")
 public class PostController {
