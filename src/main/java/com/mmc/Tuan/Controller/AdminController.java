@@ -77,4 +77,18 @@ public class AdminController{
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/admin/post/detail/{id}")
+    public ResponseEntity<Post> getPostById (@PathVariable("id") long postId){
+        Optional<Post> post = postRepository.findByPostId(postId);
+        try {
+            if(post.isPresent()){
+                return new ResponseEntity<>(post.get(),HttpStatus.OK);
+            }
+            return new ResponseEntity<>(new Post(), HttpStatus.NOT_FOUND);
+
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
 }

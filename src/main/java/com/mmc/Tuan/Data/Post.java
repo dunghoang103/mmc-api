@@ -27,13 +27,13 @@ public class Post {
 
         @Lob
         @Column(name="post_pic")
-        private byte[] postPic;
+        private String postPic;
 
         public Post(){
 
         }
 
-        public Post( String postName, String postDescription, String postContent, String postType, long postYear, byte[] postPic) {
+        public Post( String postName, String postDescription, String postContent, String postType, long postYear, String postPic) {
                 this.postName = postName;
                 this.postDescription = postDescription;
                 this.postContent = postContent;
@@ -90,11 +90,11 @@ public class Post {
                 this.postYear = postYear;
         }
 
-        public byte[] getPostPic() {
+        public String getPostPic() {
                 return postPic;
         }
 
-        public void setPostPic(byte[] postPic) {
+        public void setPostPic(String postPic) {
                 this.postPic = postPic;
         }
 

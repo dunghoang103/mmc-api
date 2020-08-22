@@ -77,10 +77,6 @@ public class PostController {
 
         List<Post> posts = postRepository.findByPostTypeAndPostYear(posttype,postyear);
         try {
-
-            if(posts.isEmpty()) {
-                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            }
             return new ResponseEntity<>(posts, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
