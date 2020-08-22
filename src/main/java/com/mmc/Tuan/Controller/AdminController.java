@@ -69,9 +69,6 @@ public class AdminController{
             else {
                 postRepository.findByPostNameContaining(postName).forEach(posts::add);
             }
-            if (posts.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
             return new ResponseEntity<>(posts, HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -87,6 +84,19 @@ public class AdminController{
             }
             return new ResponseEntity<>(new Post(), HttpStatus.NOT_FOUND);
 
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+    @DeleteMapping("/admin/post/{id}")
+    public ResponseEntity<Post> deleteById (@PathVariable("id") long postId){
+        Optional<Post> post = postRepository.findByPostId(postId);
+        try {
+            if(post.isPresent()) {
+                postRepository.deleteById(postId);
+             return new ResponseEntity<>(HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
         }
